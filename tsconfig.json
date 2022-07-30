@@ -4,8 +4,6 @@
     "jsx": "react",
     "strict": true
     
-  },
-  "include": [
-    "./src/**/*.ts"
-  ]
+  }
+  
 }
