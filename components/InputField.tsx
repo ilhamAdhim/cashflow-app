@@ -1,8 +1,36 @@
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { Dispatch, SetStateAction } from "react";
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Text,
+  ImageStyle,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 
-function InputField({ text, updateText, placeholder, icon }) {
+interface IInputField {
+  text: string;
+  updateText?: Dispatch<SetStateAction<string>>;
+  placeholder: string;
+  icon: React.ComponentProps<typeof FontAwesome>["name"];
+  role: string;
+  isDisabled?: boolean;
+
+  showDatepicker?: any;
+}
+
+const InputField: React.FC<IInputField> = ({
+  text,
+  updateText,
+  placeholder,
+  icon,
+  role,
+  isDisabled = false,
+  ...props
+}) => {
   return (
     <View>
       <View
@@ -14,34 +42,69 @@ function InputField({ text, updateText, placeholder, icon }) {
 
         <TextInput
           value={text}
+          editable={!isDisabled}
           placeholder={placeholder}
           onChangeText={updateText}
-          style={styles.inputFieldStyle}
+          style={
+            role.toLowerCase().includes("tanggal")
+              ? styles.inputFieldStyleWithDatepicker
+              : styles.inputFieldStyle
+          }
+          secureTextEntry={role === "password" ? true : false}
         />
+
+        {role.toLowerCase().includes("tanggal") && (
+          <View style={styles.iconStyleDatePicker}>
+            <TouchableOpacity onPress={props.showDatepicker}>
+              <FontAwesome name="pencil" size={20} color="#076302" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
-}
+};
+
+const inputFieldStyleTemplate = {
+  backgroundColor: "#ffffff",
+  borderTopRightRadius: 15,
+  borderBottomRightRadius: 15,
+  paddingLeft: 10,
+  paddingVertical: 15,
+  paddingHorizontal: 10,
+  elevation: 2,
+  width: 250,
+};
+
+const iconStyleTemplate: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+  width: 50,
+  backgroundColor: "#ffffff",
+  elevation: 2,
+  borderTopLeftRadius: 15,
+  borderBottomLeftRadius: 15,
+};
 
 const styles = StyleSheet.create({
-  inputFieldStyle: {
-    backgroundColor: "#ffffff",
+  inputFieldStyle: inputFieldStyleTemplate,
+
+  inputFieldStyleWithDatepicker: {
+    ...inputFieldStyleTemplate,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    elevation: 2,
+    width: 200,
+  },
+
+  iconStyle: iconStyleTemplate,
+
+  iconStyleDatePicker: {
+    ...iconStyleTemplate,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
-    paddingLeft: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    elevation: 2,
-    width: 250,
-  },
-  iconStyle: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    backgroundColor: "#ffffff",
-    elevation: 2,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
   },
 });
 
