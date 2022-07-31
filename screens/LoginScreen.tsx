@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -10,10 +10,22 @@ import {
 } from "react-native";
 import InputField from "../components/InputField";
 import LoginImage from "../components/svgs/LoginImage";
+import {
+  createTableFinancialRecords,
+  createTableUser,
+  getDBConnection,
+} from "../db/db-service";
+
+const db = getDBConnection();
 
 const LoginScreen = ({ navigation }: any) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    createTableFinancialRecords(db);
+    createTableUser(db);
+  }, []);
 
   const validateLogin = () => {
     if (

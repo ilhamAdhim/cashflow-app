@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import { Alert, Button, Text, TouchableOpacity, View } from "react-native";
-import DateTimePicker, {
-  DateTimePickerAndroid,
-} from "@react-native-community/datetimepicker";
+import { Alert, View } from "react-native";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import InputField from "../components/InputField";
 import ButtonCustom from "../components/ButtonCustom";
+import { getDBConnection, saveFinancialRecords } from "../db/db-service";
 
+const db = getDBConnection();
 function TambahPengeluaranScreen({ navigation }: any) {
   const [date, setDate] = useState(new Date());
-  const [amount, setAmount] = useState("");
+  const [nominal, setNominal] = useState("");
   const [notes, setNotes] = useState("");
 
-  const onChange = (event: any, selectedDate: any) => {
-    const currentDate = selectedDate;
-    setDate(currentDate);
-  };
+  const onChange = (event: any, selectedDate: any) => setDate(selectedDate);
 
   const showMode = (currentMode: any) => {
     DateTimePickerAndroid.open({
@@ -25,8 +22,18 @@ function TambahPengeluaranScreen({ navigation }: any) {
     });
   };
 
-  const showDatepicker = () => {
-    showMode("date");
+  const showDatepicker = () => showMode("date");
+
+  const handleSubmitData = () => {
+    saveFinancialRecords(db, [
+      {
+        nominal: parseInt(nominal),
+        notes,
+        date: date.toLocaleDateString(),
+        category: "pengeluaran",
+      },
+    ]);
+    Alert.alert("Data Tersimpan");
   };
 
   return (
@@ -40,7 +47,7 @@ function TambahPengeluaranScreen({ navigation }: any) {
         isDisabled
         icon="calendar"
         role="tanggal_pemasukan"
-        text={date.toLocaleString()}
+        text={date.toLocaleDateString()}
         showDatepicker={showDatepicker}
         placeholder="Pilih tanggal transaksi"
       />
@@ -48,9 +55,9 @@ function TambahPengeluaranScreen({ navigation }: any) {
       <InputField
         icon="money"
         role="nominal"
-        text={amount}
-        updateText={setAmount}
-        placeholder="Masukkan nominal ..."
+        text={nominal.toString()}
+        updateText={setNominal}
+        placeholder="Masukkan nominal Rupiah ..."
       />
 
       <InputField
@@ -60,6 +67,7 @@ function TambahPengeluaranScreen({ navigation }: any) {
         updateText={setNotes}
         placeholder="Masukkan catatan  ..."
       />
+
       <InputField
         isDisabled
         icon="level-down"
@@ -77,14 +85,21 @@ function TambahPengeluaranScreen({ navigation }: any) {
         }}
       >
         <ButtonCustom
+          icon="save"
+          isDisabled={
+            nominal === "" || notes === "" || date.toLocaleDateString() === ""
+              ? true
+              : false
+          }
           text="Simpan Data"
           backgroundColor="#076302"
-          onPress={() => Alert.alert("Data Tersimpan")}
+          onPress={handleSubmitData}
         />
 
         <View style={{ flex: 0.1 }} />
 
         <ButtonCustom
+          icon="arrow-circle-left"
           text="Kembali"
           backgroundColor="#f78783"
           onPress={() => navigation.goBack()}

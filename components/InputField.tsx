@@ -5,9 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Text,
-  ImageStyle,
-  TextStyle,
   ViewStyle,
 } from "react-native";
 
@@ -42,6 +39,9 @@ const InputField: React.FC<IInputField> = ({
 
         <TextInput
           value={text}
+          keyboardType={
+            role.toLowerCase().includes("nominal") ? "numeric" : "default"
+          }
           editable={!isDisabled}
           placeholder={placeholder}
           onChangeText={updateText}
@@ -73,6 +73,7 @@ const inputFieldStyleTemplate = {
   paddingVertical: 15,
   paddingHorizontal: 10,
   elevation: 2,
+  color: "black",
   width: 250,
 };
 

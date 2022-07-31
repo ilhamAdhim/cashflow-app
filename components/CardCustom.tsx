@@ -1,14 +1,6 @@
-import { useLinkProps, useNavigation } from "@react-navigation/native";
+import { useLinkProps } from "@react-navigation/native";
 import React from "react";
-import {
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface ICardContent {
   title: string;
@@ -48,9 +40,11 @@ export const CardContent: React.FC<ICardContent> = ({ title, imageSource }) => (
 
     <Text
       style={{
-        color: title.toLowerCase().includes("pengeluaran") ? "red" : "green",
-        textAlign: "center",
         fontWeight: "bold",
+        textAlign: "center",
+        color: title.toLowerCase().includes("pengeluaran")
+          ? "#b00b0b"
+          : "green",
       }}
     >
       {title}
@@ -65,7 +59,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginHorizontal: 10,
     borderRadius: 15,
-    elevation: 2,
+    elevation: 10,
 
     display: "flex",
     flexDirection: "column",

@@ -1,13 +1,17 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
 import CardCustom from "../components/CardCustom";
 import PengaturanScreen from "./PengaturanScreen";
-import RiwayatScreen from "./RiwayatScreen";
+import DetailCashflowScreen from "./DetailCashflowScreen";
 import TambahPemasukanScreen from "./TambahPemasukanScreen";
 import TambahPengeluaranScreen from "./TambahPengeluaranScreen";
+import {
+  getDBConnection,
+  getTotalPemasukan,
+  getTotalPengeluaran,
+} from "../db/db-service";
+import { renderRupiah } from "../common";
 
 type IStackHomeParamList = {
   Home: undefined;
@@ -17,13 +21,58 @@ type IStackHomeParamList = {
   "Tambah Pengeluaran": undefined;
 };
 
+const db = getDBConnection();
 const Stack = createNativeStackNavigator<IStackHomeParamList>();
-const Tab = createBottomTabNavigator<IStackHomeParamList>();
 
 function HomeScreen({ navigation }: any) {
+  const [totalPemasukan, setTotalPemasukan] = React.useState(0);
+  const [totalPengeluaran, setTotalPengeluaran] = React.useState(0);
+
+  const loadDataCallback = useCallback(async () => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // The screen is focused
+      // Call any action and update data
+      console.log("apa bener navigasi");
+      try {
+        getTotalPemasukan(db, setTotalPemasukan);
+        getTotalPengeluaran(db, setTotalPengeluaran);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    loadDataCallback();
+  }, [loadDataCallback]);
+
+  useEffect(() => {
+    console.log(totalPemasukan);
+    console.log(totalPengeluaran);
+  }, [totalPemasukan, totalPengeluaran]);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#dbe4f3" barStyle="dark-content" />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontWeight: "bold", color: "green" }}>
+          Pemasukan Bulan Ini
+          {` ${renderRupiah(totalPemasukan)}`}
+        </Text>
+        <Text style={{ fontWeight: "bold", color: "#b00b0b" }}>
+          Pengeluaran Bulan Ini
+          {` ${renderRupiah(totalPengeluaran)}`}
+        </Text>
+      </View>
       <View style={styles.buttonWrapper}>
         <CardCustom
           to={{ screen: "Tambah Pemasukan" }}
@@ -63,7 +112,7 @@ function HomeScreenNavigator() {
         name="Tambah Pengeluaran"
         component={TambahPengeluaranScreen}
       />
-      <Stack.Screen name="Detail Cashflow" component={RiwayatScreen} />
+      <Stack.Screen name="Detail Cashflow" component={DetailCashflowScreen} />
       <Stack.Screen name="Pengaturan" component={PengaturanScreen} />
     </Stack.Navigator>
   );

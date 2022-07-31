@@ -1,8 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Alert, Image, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import ButtonCustom from "../components/ButtonCustom";
-import { CardContent } from "../components/CardCustom";
 import InputField from "../components/InputField";
 
 function PengaturanScreen({ navigation }: any) {
@@ -10,8 +9,8 @@ function PengaturanScreen({ navigation }: any) {
   const [newPassword, setNewPassword] = useState("");
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         alignItems: "center",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -47,6 +46,7 @@ function PengaturanScreen({ navigation }: any) {
         }}
       >
         <ButtonCustom
+          icon="save"
           text="Simpan Data"
           backgroundColor="#076302"
           onPress={() => Alert.alert("Data Tersimpan")}
@@ -55,6 +55,7 @@ function PengaturanScreen({ navigation }: any) {
         <View style={{ flex: 0.1 }} />
 
         <ButtonCustom
+          icon="arrow-circle-o-left"
           text="Kembali"
           backgroundColor="#f78783"
           onPress={() => navigation.goBack()}
@@ -71,7 +72,7 @@ function PengaturanScreen({ navigation }: any) {
           Tanggal {new Date().toLocaleDateString()}
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
