@@ -12,31 +12,41 @@ import InputField from "../components/InputField";
 import LoginImage from "../components/svgs/LoginImage";
 import {
   createTableFinancialRecords,
-  createTableUser,
   getDBConnection,
-} from "../db/db-service";
+} from "../db/db-service.records";
+
+import {
+  createTableUser,
+  getUser,
+  loginUser,
+  checkUserRegistered,
+} from "../db/db-service.user";
 
 const db = getDBConnection();
 
 const LoginScreen = ({ navigation }: any) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    createTableFinancialRecords(db);
-    createTableUser(db);
+    Promise.all([
+      createTableFinancialRecords(db),
+      createTableUser(db),
+
+      checkUserRegistered(db),
+    ]).then(() => setIsAppReady(true));
   }, []);
 
-  const validateLogin = () => {
-    if (
-      username.toLowerCase() === "admin" &&
-      password.toLowerCase() === "admin"
-    ) {
-      navigation.navigate("HomeNavigator");
-    } else {
-      Alert.alert("Username atau Password salah");
-    }
-  };
+  const validateLogin = () => loginUser(db, username, password, setIsLoggedIn);
+
+  useEffect(() => {
+    if (isAppReady)
+      if (isLoggedIn) {
+        navigation.navigate("HomeNavigator");
+      }
+  }, [isAppReady, isLoggedIn]);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#dbe4f3" }}>

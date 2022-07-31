@@ -1,7 +1,7 @@
 import { SQLiteDatabase, Transaction } from "react-native-sqlite-storage";
 import { FinancialRecord } from "../models";
 import * as SQLite from "expo-sqlite";
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import { SQLTransaction } from "expo-sqlite";
 
 const tableName = "records";
@@ -38,20 +38,6 @@ export const createTableFinancialRecords = async (db: any) => {
   );
 };
 
-export const createTableUser = async (db: any) => {
-  const query = `CREATE TABLE IF NOT EXISTS user(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL
-    );`;
-
-  await db.transaction(
-    (tx: Transaction) => tx.executeSql(query),
-    (error: any) => console.log("error ketika membuat tabel user", error),
-    () => console.log("tabel user terbentuk")
-  );
-};
-
 export const getTotalPemasukan = async (db: any, setTotalPemasukan: any) => {
   const query = `SELECT SUM(nominal) AS total FROM ${tableName} WHERE category = 'pemasukan'`;
 
@@ -59,7 +45,6 @@ export const getTotalPemasukan = async (db: any, setTotalPemasukan: any) => {
     async (tx: Transaction) =>
       tx.executeSql(query, [], (_, { rows }) => {
         rows.length > 0 && setTotalPemasukan(rows.item(0).total);
-        setTotalPemasukan(rows.item(0).total);
       }),
     (error: any) =>
       console.log("error ketika mengambil total pemasukan", error),
@@ -77,7 +62,6 @@ export const getTotalPengeluaran = async (
     (tx: Transaction) =>
       tx.executeSql(query, [], (_, { rows }) => {
         rows.length > 0 && setTotalPengeluaran(rows.item(0).total);
-        setTotalPengeluaran(rows.item(0).total);
       }),
     (error: any) =>
       console.log("error ketika mengambil total pengeluaran", error),
@@ -127,16 +111,17 @@ export const saveFinancialRecords = async (
 
   return await db.transaction(
     (tx: Transaction) => tx.executeSql(insertQuery),
-    (error: any) => console.log("gagal menambahkan data", error)
+    (error: any) =>
+      console.log("gagal menambahkan data financial record", error)
   );
 };
 
-export const deleteFinancialRecord = async (db: SQLiteDatabase, id: number) => {
+const deleteFinancialRecord = async (db: SQLiteDatabase, id: number) => {
   const deleteQuery = `DELETE from ${tableName} where rowid = ${id}`;
   await db.transaction((tx: Transaction) => tx.executeSql(deleteQuery));
 };
 
-export const deleteTable = async (db: SQLiteDatabase) => {
+const deleteTable = async (db: SQLiteDatabase) => {
   const query = `drop table ${tableName}`;
   await db.transaction((tx: Transaction) => tx.executeSql(query));
 };

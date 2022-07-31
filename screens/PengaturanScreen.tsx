@@ -1,12 +1,56 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import ButtonCustom from "../components/ButtonCustom";
 import InputField from "../components/InputField";
+import { getDBConnection } from "../db/db-service.records";
+import {
+  changePassword,
+  getUser,
+  getUserWithPassword,
+} from "../db/db-service.user";
+
+const db = getDBConnection();
+
+interface IUser {
+  id: number;
+  username: string;
+  password: string;
+}
 
 function PengaturanScreen({ navigation }: any) {
+  const [user, setUser] = useState<IUser>({
+    id: 0,
+    username: "",
+    password: "",
+  });
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  const validateChangePassword = () =>
+    getUserWithPassword(db, currentPassword, newPassword);
+
+  const loadDataCallback = useCallback(async () => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      try {
+        getUser(db, setUser);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    console.log(user, "user kah ini");
+  }, [user]);
+
+  useEffect(() => {
+    loadDataCallback();
+  }, [loadDataCallback]);
 
   return (
     <ScrollView
@@ -46,10 +90,11 @@ function PengaturanScreen({ navigation }: any) {
         }}
       >
         <ButtonCustom
+          isDisabled={currentPassword === "" || newPassword === ""}
           icon="save"
           text="Simpan Data"
           backgroundColor="#076302"
-          onPress={() => Alert.alert("Data Tersimpan")}
+          onPress={validateChangePassword}
         />
 
         <View style={{ flex: 0.1 }} />

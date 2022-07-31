@@ -3,7 +3,10 @@ import { Alert, View } from "react-native";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import InputField from "../components/InputField";
 import ButtonCustom from "../components/ButtonCustom";
-import { getDBConnection, saveFinancialRecords } from "../db/db-service";
+import {
+  getDBConnection,
+  saveFinancialRecords,
+} from "../db/db-service.records";
 
 const db = getDBConnection();
 function TambahPemasukanScreen({ navigation }: any) {

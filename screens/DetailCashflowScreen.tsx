@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { renderRupiah } from "../common";
-import { getDBConnection, getFinancialRecords } from "../db/db-service";
+import { getDBConnection, getFinancialRecords } from "../db/db-service.records";
 import { FinancialRecord } from "../models";
 
 const db = getDBConnection();

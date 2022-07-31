@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect } from "react";
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import CardCustom from "../components/CardCustom";
 import PengaturanScreen from "./PengaturanScreen";
 import DetailCashflowScreen from "./DetailCashflowScreen";
@@ -10,7 +10,7 @@ import {
   getDBConnection,
   getTotalPemasukan,
   getTotalPengeluaran,
-} from "../db/db-service";
+} from "../db/db-service.records";
 import { renderRupiah } from "../common";
 
 type IStackHomeParamList = {
@@ -32,7 +32,6 @@ function HomeScreen({ navigation }: any) {
     const unsubscribe = navigation.addListener("focus", () => {
       // The screen is focused
       // Call any action and update data
-      console.log("apa bener navigasi");
       try {
         getTotalPemasukan(db, setTotalPemasukan);
         getTotalPengeluaran(db, setTotalPengeluaran);
@@ -55,23 +54,50 @@ function HomeScreen({ navigation }: any) {
   }, [totalPemasukan, totalPengeluaran]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <StatusBar backgroundColor="#dbe4f3" barStyle="dark-content" />
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ fontWeight: "bold", color: "green" }}>
-          Pemasukan Bulan Ini
-          {` ${renderRupiah(totalPemasukan)}`}
+      <View style={styles.topSection}>
+        <Text style={{ fontWeight: "bold" }}>Halo, Muhammad Ilham Adhim !</Text>
+        <Text>
+          Saldo anda saat ini {renderRupiah(totalPemasukan - totalPengeluaran)}
         </Text>
-        <Text style={{ fontWeight: "bold", color: "#b00b0b" }}>
-          Pengeluaran Bulan Ini
-          {` ${renderRupiah(totalPengeluaran)}`}
-        </Text>
+      </View>
+      <View style={styles.row}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: "#b8dbc2",
+            },
+          ]}
+        >
+          <Text style={{ fontWeight: "bold", color: "green" }}>
+            Pemasukan Bulan Ini
+          </Text>
+          <Text style={{ fontWeight: "bold", color: "green" }}>
+            {` ${renderRupiah(totalPemasukan)}`}
+          </Text>
+        </View>
+
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: "#f78783",
+            },
+          ]}
+        >
+          <Text style={{ fontWeight: "bold", color: "#b00b0b" }}>
+            Pengeluaran Bulan Ini
+          </Text>
+          <Text style={{ fontWeight: "bold", color: "#b00b0b" }}>
+            {` ${renderRupiah(totalPengeluaran)}`}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.chartStyle}>
+        <Text>Anggap ini grafik</Text>
       </View>
       <View style={styles.buttonWrapper}>
         <CardCustom
@@ -95,7 +121,7 @@ function HomeScreen({ navigation }: any) {
           imageSource={require("../assets/images/undraw_Personal_settings_re_i6w4__1_-removebg-preview.png")}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -123,13 +149,53 @@ export default HomeScreenNavigator;
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
+    paddingBottom: 20,
   },
+
+  chartStyle: {
+    height: 400,
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
+
+  topSection: {
+    textAlign: "left",
+    marginLeft: 20,
+    marginVertical: 10,
+  },
+
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+
+  columns: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+
   buttonWrapper: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     flexWrap: "wrap",
+  },
+
+  card: {
+    padding: 10,
+    paddingVertical: 14,
+    marginTop: 20,
+    marginHorizontal: 10,
+    borderRadius: 15,
+    elevation: 5,
+    flexWrap: "wrap",
+    alignItems: "center",
   },
 });
