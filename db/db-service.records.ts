@@ -38,34 +38,43 @@ export const createTableFinancialRecords = async (db: any) => {
   );
 };
 
-export const getTotalPemasukan = async (db: any, setTotalPemasukan: any) => {
-  const query = `SELECT SUM(nominal) AS total FROM ${tableName} WHERE category = 'pemasukan'`;
+export const getTotalByCategory = async (
+  db: any,
+  setTotal: any,
+  category?: string
+) => {
+  const query = `SELECT SUM(nominal) AS total FROM ${tableName} WHERE category = ?`;
 
   await db.transaction(
     async (tx: Transaction) =>
-      tx.executeSql(query, [], (_, { rows }) => {
-        rows.length > 0 && setTotalPemasukan(rows.item(0).total);
+      tx.executeSql(query, [category], (_, { rows }) => {
+        rows.length > 0 && setTotal(rows.item(0).total);
       }),
     (error: any) =>
-      console.log("error ketika mengambil total pemasukan", error),
-    () => console.log("total pemasukan berhasil diambil")
+      console.log("error ketika mengambil total by kategori", error),
+    () => console.log("total by kategori berhasil diambil")
   );
 };
 
-export const getTotalPengeluaran = async (
+export const getDataByCategory = async (
   db: any,
-  setTotalPengeluaran: any
+  setDataByCategory: any,
+  category?: string
 ) => {
-  const query = `SELECT SUM(nominal) AS total FROM ${tableName} WHERE category = 'pengeluaran'`;
+  const query = `SELECT nominal,date FROM ${tableName} WHERE category = ?`;
 
   await db.transaction(
-    (tx: Transaction) =>
-      tx.executeSql(query, [], (_, { rows }) => {
-        rows.length > 0 && setTotalPengeluaran(rows.item(0).total);
-      }),
+    async (tx: Transaction) =>
+      tx.executeSql(
+        query,
+        [category],
+        (_, { rows: { _array, length } }: any) => {
+          if (length) setDataByCategory(_array);
+        }
+      ),
     (error: any) =>
-      console.log("error ketika mengambil total pengeluaran", error),
-    () => console.log("total pengeluaran berhasil diambil")
+      console.log("error ketika mengambil data by kategori", error),
+    () => console.log("data by kategori berhasil diambil")
   );
 };
 
@@ -77,15 +86,13 @@ export const getFinancialRecords = async (
   try {
     await db.transaction(async (tx: SQLTransaction) =>
       tx.executeSql(
-        `SELECT rowid as id, nominal, notes, date, category FROM ${tableName}`,
+        `SELECT rowid as id, nominal, notes, date, category FROM ${tableName} order by date asc`,
         [],
         (_, { rows: { _array, length } }) => {
           if (length) {
             setDataRecords(_array);
-            console.log("apakah masuk ? iya");
           } else {
             saveFinancialRecords(db, initialTodos);
-            console.log("apakah masuk ? tidak");
             setDataRecords(initialTodos);
           }
         }

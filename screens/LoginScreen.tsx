@@ -5,7 +5,6 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ScrollView,
 } from "react-native";
 import InputField from "../components/InputField";
@@ -17,7 +16,6 @@ import {
 
 import {
   createTableUser,
-  getUser,
   loginUser,
   checkUserRegistered,
 } from "../db/db-service.user";

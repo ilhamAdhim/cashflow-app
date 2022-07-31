@@ -1,17 +1,25 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect } from "react";
-import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import CardCustom from "../components/CardCustom";
 import PengaturanScreen from "./PengaturanScreen";
 import DetailCashflowScreen from "./DetailCashflowScreen";
 import TambahPemasukanScreen from "./TambahPemasukanScreen";
 import TambahPengeluaranScreen from "./TambahPengeluaranScreen";
 import {
+  getDataByCategory,
   getDBConnection,
-  getTotalPemasukan,
-  getTotalPengeluaran,
+  getTotalByCategory,
 } from "../db/db-service.records";
 import { renderRupiah } from "../common";
+import { LineChart } from "react-native-chart-kit";
 
 type IStackHomeParamList = {
   Home: undefined;
@@ -25,16 +33,25 @@ const db = getDBConnection();
 const Stack = createNativeStackNavigator<IStackHomeParamList>();
 
 function HomeScreen({ navigation }: any) {
+  const [isDataFetched, setIsDataFetched] = React.useState(false);
+
   const [totalPemasukan, setTotalPemasukan] = React.useState(0);
   const [totalPengeluaran, setTotalPengeluaran] = React.useState(0);
+
+  const [dataPemasukan, setDataPemasukan] = React.useState([]);
+  const [dataPengeluaran, setDataPengeluaran] = React.useState([]);
 
   const loadDataCallback = useCallback(async () => {
     const unsubscribe = navigation.addListener("focus", () => {
       // The screen is focused
       // Call any action and update data
       try {
-        getTotalPemasukan(db, setTotalPemasukan);
-        getTotalPengeluaran(db, setTotalPengeluaran);
+        Promise.all([
+          getTotalByCategory(db, setTotalPemasukan, "pemasukan"),
+          getTotalByCategory(db, setTotalPengeluaran, "pengeluaran"),
+          getDataByCategory(db, setDataPemasukan, "pemasukan"),
+          getDataByCategory(db, setDataPengeluaran, "pengeluaran"),
+        ]).then(() => setIsDataFetched(true));
       } catch (error) {
         console.error(error);
       }
@@ -49,9 +66,21 @@ function HomeScreen({ navigation }: any) {
   }, [loadDataCallback]);
 
   useEffect(() => {
-    console.log(totalPemasukan);
-    console.log(totalPengeluaran);
-  }, [totalPemasukan, totalPengeluaran]);
+    if (isDataFetched) {
+      let dataNominalPemasukan: any = [];
+      let dataNominalPengeluaran: any = [];
+
+      dataPemasukan?.map((item: any) =>
+        dataNominalPemasukan.push(item.nominal)
+      );
+      dataPengeluaran?.map((item: any) =>
+        dataNominalPengeluaran.push(item.nominal)
+      );
+
+      console.log("dataNominalPemasukan ", dataNominalPemasukan);
+      console.log("dataNominalPengeluaran ", dataNominalPengeluaran);
+    }
+  }, [isDataFetched, dataPemasukan, dataPengeluaran]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -96,9 +125,54 @@ function HomeScreen({ navigation }: any) {
         </View>
       </View>
 
-      <View style={styles.chartStyle}>
-        <Text>Anggap ini grafik</Text>
-      </View>
+      {isDataFetched && dataPemasukan.length > 0 && dataPengeluaran.length > 0 && (
+        <View style={styles.chartStyle}>
+          <LineChart
+            bezier
+            withInnerLines={false}
+            withOuterLines={false}
+            height={500}
+            width={Dimensions.get("window").width - 30} // from react-native
+            data={{
+              labels:
+                dataPemasukan.length > dataPengeluaran.length
+                  ? dataPemasukan.map((item: any) => item.date)
+                  : dataPengeluaran.map((item: any) => item.date),
+              datasets: [
+                {
+                  data: dataPemasukan?.map((item: any) =>
+                    parseInt(item.nominal)
+                  ),
+                  strokeWidth: 2,
+                  color: () => `#b8dbc2`, // optional
+                },
+                {
+                  data: dataPengeluaran?.map((item: any) =>
+                    parseInt(item.nominal)
+                  ),
+                  strokeWidth: 2,
+                  color: () => `#f78783`, // optional
+                },
+              ],
+              legend: ["Pemasukan", "Pengeluaran"],
+            }}
+            formatYLabel={(value) => renderRupiah(parseInt(value))}
+            chartConfig={{
+              color: (opacity = 1) => "#575757",
+              backgroundGradientFrom: "white",
+              backgroundGradientTo: "white",
+
+              decimalPlaces: 0, // optional, defaults to 2dp
+            }}
+            style={{
+              borderRadius: 4,
+              elevation: 10,
+              marginHorizontal: 16,
+            }}
+          />
+        </View>
+      )}
+
       <View style={styles.buttonWrapper}>
         <CardCustom
           to={{ screen: "Tambah Pemasukan" }}
@@ -153,12 +227,11 @@ const styles = StyleSheet.create({
   },
 
   chartStyle: {
-    height: 400,
+    height: 600,
     width: "100%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
   },
 
   topSection: {
