@@ -62,7 +62,6 @@ export const getUserWithPassword = async (
       tx.executeSql(query, [password], (_, { rows }) => {
         if (rows.length > 0) {
           changePassword(db, newPassword, 1);
-          //   console.log("Berarti bisa diupdate");
           Alert.alert("Berarti bisa diupdate");
         } else Alert.alert("Password lama salah");
       }),

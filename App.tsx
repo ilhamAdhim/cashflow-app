@@ -28,8 +28,7 @@ export default function App() {
               name="HomeNavigator"
               component={HomeScreenNavigator}
               options={{
-                headerShown: true,
-                headerTitle: "Demo Cashflow App",
+                headerShown: false,
                 animation: "slide_from_right",
               }}
             />

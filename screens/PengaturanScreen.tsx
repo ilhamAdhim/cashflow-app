@@ -1,14 +1,10 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import ButtonCustom from "../components/ButtonCustom";
 import InputField from "../components/InputField";
 import { getDBConnection } from "../db/db-service.records";
-import {
-  changePassword,
-  getUser,
-  getUserWithPassword,
-} from "../db/db-service.user";
+import { getUser, getUserWithPassword } from "../db/db-service.user";
 
 const db = getDBConnection();
 
@@ -120,7 +116,7 @@ function PengaturanScreen({ navigation }: any) {
           }}
         >
           <Image
-            source={require("../assets/images/1841720076.jpeg")}
+            source={require("../assets/images/profile.photo.png")}
             style={{
               width: 100,
               height: 100,

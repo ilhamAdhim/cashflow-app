@@ -1,5 +1,5 @@
 import { useLinkProps } from "@react-navigation/native";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import React from "react";
 
 interface ICardContent {
@@ -9,12 +9,26 @@ interface ICardContent {
   redirectTo?: any;
 }
 
-const CardCustom = ({ to, action, children, ...rest }: any) => {
+const CardCustom = ({ to, action, children, isDisabled, ...rest }: any) => {
   const { onPress, ...props } = useLinkProps({ to, action });
   return (
     <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
+      style={[
+        styles.card,
+        {
+          backgroundColor: isDisabled ? "#9fa1a0" : "#b8dbc2",
+        },
+      ]}
+      disabled={isDisabled}
+      onPress={
+        isDisabled
+          ? Alert.alert(
+              "Data Kosong",
+              "Silahkan tambahkan data pemasukan atau pengeluaran terlebih dahulu",
+              [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+            )
+          : onPress
+      }
       {...props}
       {...rest}
     >
@@ -54,7 +68,6 @@ export const CardContent: React.FC<ICardContent> = ({ title, imageSource }) => (
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#b8dbc2",
     paddingVertical: 14,
     marginTop: 20,
     marginHorizontal: 10,

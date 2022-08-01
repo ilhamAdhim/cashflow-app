@@ -1,7 +1,8 @@
 import { SQLiteDatabase, Transaction } from "react-native-sqlite-storage";
 import { FinancialRecord } from "../models";
-import { Alert, Platform } from "react-native";
-import { openDatabase, SQLTransaction } from "expo-sqlite";
+import { Platform } from "react-native";
+import * as SQLite from "expo-sqlite";
+import { SQLTransaction } from "expo-sqlite";
 
 const tableName = "records";
 
@@ -16,7 +17,7 @@ export const getDBConnection = () => {
     };
   }
 
-  const db = openDatabase("financial_records.db");
+  const db = SQLite.openDatabase("financial_records.db");
   return db;
 };
 
@@ -60,7 +61,7 @@ export const getDataByCategory = async (
   setDataByCategory: any,
   category?: string
 ) => {
-  const query = `SELECT nominal,date FROM ${tableName} WHERE category = ?`;
+  const query = `SELECT nominal,date FROM ${tableName} WHERE category = ? order by date asc`;
 
   await db.transaction(
     async (tx: Transaction) =>
@@ -91,7 +92,7 @@ export const getFinancialRecords = async (
           if (length) {
             setDataRecords(_array);
           } else {
-            saveFinancialRecords(db, initialTodos);
+            saveFinancialRecords(db, initialTodos[0]);
             setDataRecords(initialTodos);
           }
         }
@@ -105,18 +106,34 @@ export const getFinancialRecords = async (
 
 export const saveFinancialRecords = async (
   db: any,
-  financialRecord: FinancialRecord[]
+  financialRecord: FinancialRecord
 ) => {
-  const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}(nominal, notes, date, category) values` +
-    financialRecord
-      .map(
-        (i) => `('${i.nominal}', '${i.notes}', '${i.date}', '${i.category}')`
-      )
-      .join(",");
+  let query = "";
+  // Check dulu apakah data dengan tanggal tertentu dan kategori tertentu sudah ada atau belum
+  await db.transaction(async (tx: SQLTransaction) =>
+    tx.executeSql(
+      `SELECT * from ${tableName} where date = ? and category = ?`,
+      [financialRecord.date, financialRecord.category],
+      (_, { rows: { _array, length } }) => {
+        if (length) {
+          // Jika sudah ada, maka update data tersebut
+          query = `UPDATE ${tableName} SET nominal = '${
+            parseInt(_array[0].nominal) + financialRecord.nominal
+          }'
+          , notes = '${_array[0].notes}, ${financialRecord.notes}' 
+            WHERE category = '${financialRecord.category}' AND date = '${
+            financialRecord.date
+          }'`;
+        } else {
+          // Jika belum ada, maka insert data tersebut
+          query = `INSERT INTO ${tableName} (nominal, notes, date, category) VALUES ('${financialRecord.nominal}', '${financialRecord.notes}', '${financialRecord.date}', '${financialRecord.category}')`;
+        }
+      }
+    )
+  );
 
   return await db.transaction(
-    (tx: Transaction) => tx.executeSql(insertQuery),
+    (tx: Transaction) => tx.executeSql(query),
     (error: any) =>
       console.log("gagal menambahkan data financial record", error)
   );

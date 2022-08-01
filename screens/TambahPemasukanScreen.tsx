@@ -28,14 +28,12 @@ function TambahPemasukanScreen({ navigation }: any) {
   const showDatepicker = () => showMode("date");
 
   const handleSubmitData = () => {
-    saveFinancialRecords(db, [
-      {
-        nominal: parseInt(nominal),
-        notes,
-        date: date.toLocaleDateString(),
-        category: "pemasukan",
-      },
-    ]);
+    saveFinancialRecords(db, {
+      nominal: parseInt(nominal),
+      notes,
+      date: date.toLocaleDateString(),
+      category: "pemasukan",
+    });
 
     Alert.alert("Data Tersimpan");
   };
