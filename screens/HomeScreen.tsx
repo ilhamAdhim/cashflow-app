@@ -65,13 +65,36 @@ function HomeScreen({ navigation }: any) {
     loadDataCallback();
   }, [loadDataCallback]);
 
+  useEffect(() => {
+    if (isDataFetched) {
+      let dataNominalPemasukan: any = [];
+      let dataNominalPengeluaran: any = [];
+
+      dataPemasukan?.map((item: any) =>
+        dataNominalPemasukan.push(item.nominal)
+      );
+      dataPengeluaran?.map((item: any) =>
+        dataNominalPengeluaran.push(item.nominal)
+      );
+
+      console.log("dataNominalPemasukan ", dataNominalPemasukan);
+      console.log("dataNominalPengeluaran ", dataNominalPengeluaran);
+    }
+  }, [isDataFetched, dataPemasukan, dataPengeluaran]);
+
+  useEffect(() => {
+    console.log("totalPemasukan ", totalPemasukan);
+    console.log("totalPengeluaran ", totalPengeluaran);
+  }, [totalPemasukan, totalPengeluaran]);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <StatusBar backgroundColor="#dbe4f3" barStyle="dark-content" />
       <View style={styles.topSection}>
-        <Text style={{ fontWeight: "bold" }}>Halo, Muhammad Ilham Adhim !</Text>
+        <Text style={{ fontWeight: "bold" }}>Halo, Muhammad Ilham Adhim!</Text>
         <Text>
-          Saldo anda saat ini {renderRupiah(totalPemasukan - totalPengeluaran)}
+          Saldo anda saat ini{" "}
+          {renderRupiah(totalPemasukan - totalPengeluaran, true)}
         </Text>
       </View>
       <View style={styles.row}>
@@ -87,7 +110,7 @@ function HomeScreen({ navigation }: any) {
             Pemasukan Bulan Ini
           </Text>
           <Text style={{ fontWeight: "bold", color: "green" }}>
-            {` ${renderRupiah(totalPemasukan)}`}
+            {` ${renderRupiah(totalPemasukan, true)}`}
           </Text>
         </View>
 
@@ -103,7 +126,7 @@ function HomeScreen({ navigation }: any) {
             Pengeluaran Bulan Ini
           </Text>
           <Text style={{ fontWeight: "bold", color: "#b00b0b" }}>
-            {` ${renderRupiah(totalPengeluaran)}`}
+            {` ${renderRupiah(totalPengeluaran, true)}`}
           </Text>
         </View>
       </View>
@@ -160,21 +183,28 @@ function HomeScreen({ navigation }: any) {
 
       <View style={styles.buttonWrapper}>
         <CardCustom
+          isDisabled={false}
           to={{ screen: "Tambah Pemasukan" }}
           title="Tambah Pemasukan"
           imageSource={require("../assets/images/undraw_Credit_card_payments_re_qboh-removebg-preview.png")}
         />
         <CardCustom
+          isDisabled={false}
           to={{ screen: "Tambah Pengeluaran" }}
           title="Tambah Pengeluaran"
           imageSource={require("../assets/images/undraw_Make_it_rain_re_w9pc-removebg-preview.png")}
         />
         <CardCustom
+          isDisabled={
+            (totalPemasukan === 0 || totalPemasukan === null) &&
+            (totalPengeluaran === 0 || totalPengeluaran === null)
+          }
           to={{ screen: "Detail Cashflow" }}
           title="Detail Cashflow"
           imageSource={require("../assets/images/undraw_Report_re_f5n5-removebg-preview.png")}
         />
         <CardCustom
+          isDisabled={false}
           to={{ screen: "Pengaturan" }}
           title="Pengaturan"
           imageSource={require("../assets/images/undraw_Personal_settings_re_i6w4__1_-removebg-preview.png")}
