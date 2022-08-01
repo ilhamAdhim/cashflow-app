@@ -65,23 +65,6 @@ function HomeScreen({ navigation }: any) {
     loadDataCallback();
   }, [loadDataCallback]);
 
-  useEffect(() => {
-    if (isDataFetched) {
-      let dataNominalPemasukan: any = [];
-      let dataNominalPengeluaran: any = [];
-
-      dataPemasukan?.map((item: any) =>
-        dataNominalPemasukan.push(item.nominal)
-      );
-      dataPengeluaran?.map((item: any) =>
-        dataNominalPengeluaran.push(item.nominal)
-      );
-
-      console.log("dataNominalPemasukan ", dataNominalPemasukan);
-      console.log("dataNominalPengeluaran ", dataNominalPengeluaran);
-    }
-  }, [isDataFetched, dataPemasukan, dataPengeluaran]);
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <StatusBar backgroundColor="#dbe4f3" barStyle="dark-content" />
@@ -131,8 +114,9 @@ function HomeScreen({ navigation }: any) {
             bezier
             withInnerLines={false}
             withOuterLines={false}
-            height={500}
-            width={Dimensions.get("window").width - 30} // from react-native
+            segments={5}
+            height={400}
+            width={Dimensions.get("window").width} // from react-native
             data={{
               labels:
                 dataPemasukan.length > dataPengeluaran.length
@@ -140,6 +124,7 @@ function HomeScreen({ navigation }: any) {
                   : dataPengeluaran.map((item: any) => item.date),
               datasets: [
                 {
+                  withScrollableDot: true,
                   data: dataPemasukan?.map((item: any) =>
                     parseInt(item.nominal)
                   ),
@@ -156,18 +141,18 @@ function HomeScreen({ navigation }: any) {
               ],
               legend: ["Pemasukan", "Pengeluaran"],
             }}
-            formatYLabel={(value) => renderRupiah(parseInt(value))}
+            formatYLabel={(value) => renderRupiah(parseInt(value), false)}
             chartConfig={{
               color: (opacity = 1) => "#575757",
               backgroundGradientFrom: "white",
               backgroundGradientTo: "white",
-
               decimalPlaces: 0, // optional, defaults to 2dp
             }}
             style={{
+              display: "flex",
               borderRadius: 4,
               elevation: 10,
-              marginHorizontal: 16,
+              margin: 10,
             }}
           />
         </View>
@@ -227,7 +212,6 @@ const styles = StyleSheet.create({
   },
 
   chartStyle: {
-    height: 600,
     width: "100%",
     display: "flex",
     justifyContent: "center",

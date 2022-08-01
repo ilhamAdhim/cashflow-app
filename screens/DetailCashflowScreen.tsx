@@ -40,13 +40,6 @@ const DetailCashflowScreen: React.FC = () => {
           date: "01/01/2002",
           category: "pengeluaran",
         },
-        {
-          id: "58694a0f-3da1-471f-bd96-145571e29d73",
-          nominal: 100000,
-          notes: "Ingfo pak Imam",
-          date: "01/01/2000",
-          category: "pemasukan",
-        },
       ];
 
       await getFinancialRecords(db, setDataRecords, initTodos);

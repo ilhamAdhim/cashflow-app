@@ -27,7 +27,11 @@ export default function App() {
             <Stack.Screen
               name="HomeNavigator"
               component={HomeScreenNavigator}
-              options={{ headerShown: false, animation: "slide_from_right" }}
+              options={{
+                headerShown: true,
+                headerTitle: "Demo Cashflow App",
+                animation: "slide_from_right",
+              }}
             />
           </Stack.Navigator>
         </NavigationContainer>

@@ -1,8 +1,7 @@
 import { SQLiteDatabase, Transaction } from "react-native-sqlite-storage";
 import { FinancialRecord } from "../models";
-import * as SQLite from "expo-sqlite";
 import { Alert, Platform } from "react-native";
-import { SQLTransaction } from "expo-sqlite";
+import { openDatabase, SQLTransaction } from "expo-sqlite";
 
 const tableName = "records";
 
@@ -17,7 +16,7 @@ export const getDBConnection = () => {
     };
   }
 
-  const db = SQLite.openDatabase("financial_records.db");
+  const db = openDatabase("financial_records.db");
   return db;
 };
 

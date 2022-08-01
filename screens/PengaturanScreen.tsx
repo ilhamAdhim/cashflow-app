@@ -83,7 +83,7 @@ function PengaturanScreen({ navigation }: any) {
 
       <View
         style={{
-          marginTop: 30,
+          marginVertical: 30,
           display: "flex",
           justifyContent: "space-around",
           flexDirection: "row",
@@ -111,11 +111,34 @@ function PengaturanScreen({ navigation }: any) {
         <Text style={{ fontWeight: "bold", textAlign: "center" }}>
           Aplikasi ini dibuat oleh
         </Text>
-        <Text style={{ textAlign: "justify" }}>Muhammad Ilham Adhim</Text>
-        <Text style={{ textAlign: "justify" }}>1841720076</Text>
-        <Text style={{ textAlign: "justify" }}>
-          Tanggal {new Date().toLocaleDateString()}
-        </Text>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            marginVertical: 20,
+          }}
+        >
+          <Image
+            source={require("../assets/images/1841720076.jpeg")}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 10,
+            }}
+          />
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Text style={{ textAlign: "justify" }}>Muhammad Ilham Adhim</Text>
+            <Text style={{ textAlign: "justify" }}>1841720076</Text>
+            <Text style={{ textAlign: "justify" }}>Tanggal 30 Juli 2022</Text>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );
